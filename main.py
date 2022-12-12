@@ -1,7 +1,7 @@
 import db
 from db import users
 from fastapi import FastAPI
-from fastapi import Path, Query, status
+from fastapi import Path, Query, status, UploadFile, File
 from models import UserResponse, User
 
 app = FastAPI()
@@ -43,3 +43,13 @@ async def get_user_by_id(
 async def create_user(user: User):
     db.users.append(user)
 
+
+@app.post("/post-image")
+def post_image(
+        image: UploadFile
+):
+    return {
+        "filename": image.filename,
+        "format": image.content_type,
+        "size": round(len(image.file.read()) / 1024, 2)
+    }
