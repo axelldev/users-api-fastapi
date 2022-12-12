@@ -1,7 +1,8 @@
 import db
 from db import users
 from fastapi import FastAPI
-from fastapi import Path, Query, status, UploadFile, File
+from fastapi import HTTPException
+from fastapi import Path, Query, status, UploadFile
 from models import UserResponse, User
 
 app = FastAPI()
@@ -30,13 +31,15 @@ async def get_user_by_id(
         )
 ):
     """Gets a user by the ID"""
-    user = None
+    filtered = list(filter(lambda user: user.id == user_id, users))
 
-    for u in users:
-        if u.id == user_id:
-            user = u
+    if not filtered:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with ID {user_id} not found"
+        )
 
-    return user
+    return filtered[0]
 
 
 @app.post("/users", status_code=status.HTTP_201_CREATED)
