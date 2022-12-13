@@ -8,7 +8,7 @@ from models import UserResponse, User
 app = FastAPI()
 
 
-@app.get("/users", response_model=list[UserResponse], status_code=status.HTTP_200_OK)
+@app.get("/users", response_model=list[UserResponse], status_code=status.HTTP_200_OK, tags=["Users"])
 async def get_users(
         limit: int = Query(
             10,
@@ -17,12 +17,20 @@ async def get_users(
             description="Number of users"
         ),
 ):
-    """Gets all the users"""
+    """
+    Get users
+
+    This endpoint returns a list of users
+
+    - **limit**: Number of users to return
+
+    Returns a **list of users**
+    """
 
     return users[:limit]
 
 
-@app.get("/users/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
+@app.get("/users/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK, tags=["Users"])
 async def get_user_by_id(
         user_id: int = Path(
             gt=0,
@@ -30,7 +38,16 @@ async def get_user_by_id(
             description="ID of the user"
         )
 ):
-    """Gets a user by the ID"""
+    """
+    Get user by ID
+
+    This endpoint returns a user by ID.
+
+    - **user_id**: ID of the user to return
+
+    Returns a **user**
+    """
+
     filtered = list(filter(lambda user: user.id == user_id, users))
 
     if not filtered:
@@ -42,12 +59,20 @@ async def get_user_by_id(
     return filtered[0]
 
 
-@app.post("/users", status_code=status.HTTP_201_CREATED)
+@app.post("/users", status_code=status.HTTP_201_CREATED, tags=["Users", "Post"])
 async def create_user(user: User):
+    """
+    Create user
+
+    This endpoint creates a user.
+
+    - **user**: User to create
+    """
+
     db.users.append(user)
 
 
-@app.post("/post-image")
+@app.post("/post-image", tags=["Post"])
 def post_image(
         image: UploadFile
 ):
